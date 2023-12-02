@@ -1,16 +1,16 @@
 package goentgql
 
 import (
-	"contactservice2/goentgql/config"
-	"contactservice2/goentgql/entgen"
-	"contactservice2/goentgql/gqlgen"
-	"contactservice2/goentgql/middleware"
-	"contactservice2/goentgql/runner"
 	"context"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/dmalykh/goentgql/config"
+	"github.com/dmalykh/goentgql/entgen"
+	"github.com/dmalykh/goentgql/gqlgen"
+	"github.com/dmalykh/goentgql/middleware"
+	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/urfave/cli/v2"
