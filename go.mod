@@ -4,17 +4,15 @@ go 1.21.1
 
 require (
 	dario.cat/mergo v1.0.0
-	entgo.io/contrib v0.4.5
 	entgo.io/ent v0.12.5
 	github.com/99designs/gqlgen v0.17.40
+	github.com/dmalykh/entcontrib v0.1.3
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/xiaoqidun/entps v0.0.0-20231101165119-01cd6512a038
 )
-
-replace entgo.io/contrib => github.com/dmalykh/entcontrib v0.1.2
 
 require (
 	ariga.io/atlas v0.15.1-0.20231110144547-3e8e2e192e6b // indirect

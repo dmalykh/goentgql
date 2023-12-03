@@ -1,12 +1,12 @@
 package entgen
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"entgo.io/ent/schema/field"
 	"fmt"
 	gqlconfig "github.com/99designs/gqlgen/codegen/config"
+	"github.com/dmalykh/entcontrib/entgql"
 	"github.com/dmalykh/goentgql/config"
 	"os"
 	"path/filepath"
