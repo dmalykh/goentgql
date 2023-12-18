@@ -9,7 +9,7 @@ import (
 	"github.com/dmalykh/goentgql/config"
 	"github.com/dmalykh/goentgql/entgen"
 	"github.com/dmalykh/goentgql/gqlgen"
-	"github.com/dmalykh/goentgql/middleware"
+	"github.com/dmalykh/goentgql/gqlgen/middleware"
 	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
