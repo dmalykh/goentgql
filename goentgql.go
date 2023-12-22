@@ -24,7 +24,7 @@ type GoEntGQL interface {
 
 func New(options ...Option) GoEntGQL {
 	var s = app{
-		entSchemaPath: `/schema`,
+		schemaDir: `/schema`,
 		migrator: func(drv *sql.Driver) Migrator {
 			return &dummyMigrator{}
 		},
@@ -36,7 +36,7 @@ func New(options ...Option) GoEntGQL {
 }
 
 type app struct {
-	entSchemaPath    string
+	schemaDir        string
 	packageName      string
 	executableSchema ExecutableSchema
 	extensions       []graphql.HandlerExtension
@@ -70,7 +70,7 @@ func (s *app) generateCmd() *cli.Command {
 				Package:  s.packageName,
 				Dir:      `/generated`,
 				EntConfig: &config.EntConfig{
-					SchemaPath: s.entSchemaPath,
+					SchemaPath: s.schemaDir,
 				},
 			})
 

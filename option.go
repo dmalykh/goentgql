@@ -22,9 +22,9 @@ func (*dummyMigrator) Create(ctx context.Context, opts ...schema.MigrateOption) 
 type ExecutableSchema func(drv *sql.Driver) graphql.ExecutableSchema
 type MigrationRunner func(drv *sql.Driver) Migrator
 
-func EntSchema(path string) Option {
+func SchemaDir(path string) Option {
 	return func(s *app) {
-		s.entSchemaPath = path
+		s.schemaDir = path
 	}
 }
 func Package(name string) Option {

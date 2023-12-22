@@ -25,7 +25,6 @@ func GQLConfig(conf *GraphQLConfig) (*GraphQLConfig, error) {
 
 func GQLGenDefaultConfig() *GraphQLConfig {
 	return &GraphQLConfig{
-		Directives:                    map[string]config.DirectiveConfig{},
 		StructFieldsAlwaysPointers:    true,
 		ReturnPointersInUmarshalInput: false,
 		ResolversAlwaysReturnPointers: true,
@@ -47,6 +46,9 @@ func GQLGenDefaultConfig() *GraphQLConfig {
 			Layout:  config.LayoutFollowSchema,
 			DirName: `./generated/graphqlgen`,
 			Package: `graphqlgen`,
+		},
+		Directives: map[string]config.DirectiveConfig{
+			`validation`: {SkipRuntime: true},
 		},
 		AutoBind: []string{},
 		Models: config.TypeMap{
