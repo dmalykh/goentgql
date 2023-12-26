@@ -87,6 +87,10 @@ func (c *ConfiguratorGenerate) GraphQLConfig() *GraphQLConfig {
 	return c.config.GraphQLConfig
 }
 
+func (c *ConfiguratorGenerate) ServiceConfig() *ServiceConfig {
+	return c.config.ServiceConfig
+}
+
 func DefaultGeneratorConfig() *GeneratorConfig {
 	return &GeneratorConfig{
 		EntConfig:     EntDefaultConfig(),

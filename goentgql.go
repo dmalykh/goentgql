@@ -5,10 +5,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
-	config2 "github.com/dmalykh/goentgql/generator/config"
+	"github.com/dmalykh/goentgql/generator/config"
 	"github.com/dmalykh/goentgql/generator/entgen"
 	"github.com/dmalykh/goentgql/generator/gqlgen"
 	"github.com/dmalykh/goentgql/generator/gqlgen/middleware"
+	"github.com/dmalykh/goentgql/generator/service"
 	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -60,11 +61,11 @@ func (s *app) generateCmd() *cli.Command {
 		Usage: "generates ent&gqlgen code",
 		Action: func(c *cli.Context) error {
 			// Create Configuration
-			cfg, err := config2.NewGenerator(&config2.GeneratorConfig{
+			cfg, err := config.NewGenerator(&config.GeneratorConfig{
 				BasePath:  c.Args().Get(0),
 				Package:   s.packageName,
 				OutputDir: `/generated`,
-				EntConfig: &config2.EntConfig{
+				EntConfig: &config.EntConfig{
 					SchemaPath: s.schemaDir,
 				},
 			})
@@ -89,6 +90,13 @@ func (s *app) generateCmd() *cli.Command {
 				// Generate gqlgen
 				if err := gqlgen.New(cfg.GraphQLConfig()).Generate(); err != nil {
 					return fmt.Errorf(`error generate gqlgen: %w`, err)
+				}
+			}
+
+			{
+				// Generate service
+				if err := service.New(cfg.ServiceConfig()).Generate(); err != nil {
+					return fmt.Errorf(`error generate service: %w`, err)
 				}
 			}
 			return nil

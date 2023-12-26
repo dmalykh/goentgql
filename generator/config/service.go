@@ -3,6 +3,7 @@ package config
 type ServiceConfig struct {
 	PackageName string
 	Header      string
+	OutputPath  string
 
 	EntModulePath     string
 	GraphQLModulePath string
