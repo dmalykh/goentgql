@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/dmalykh/goentgql"
-	"github.com/dmalykh/goentgql/gqlgen/directive"
+	"github.com/dmalykh/goentgql/generator/gqlgen/directive"
 
 	gent "{{ .EntModulePath }}"
 	graphqlgen "{{ .GraphQLModulePath }}"

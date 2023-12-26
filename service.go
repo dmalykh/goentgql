@@ -10,6 +10,10 @@ import (
 type ServiceRunner func(drv *sql.Driver) Service
 
 type Service interface {
-	MigrateSchema(ctx context.Context, opts ...schema.MigrateOption) error
-	ExecutionSchema() graphql.ExecutableSchema
+	MigrationSchema(drv *sql.Driver) Migrator
+	ExecutionSchema(drv *sql.Driver) graphql.ExecutableSchema
+}
+
+type Migrator interface {
+	Create(ctx context.Context, opts ...schema.MigrateOption) error
 }

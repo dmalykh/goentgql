@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"path/filepath"
+	"strings"
 )
 
 type GeneratorConfig struct {
@@ -71,8 +72,12 @@ func NewGenerator(conf *GeneratorConfig) (*ConfiguratorGenerate, error) {
 	// Service config
 	cfg.EntConfig.Header = cfg.Header
 	cfg.ServiceConfig.Header = cfg.Header
-	cfg.ServiceConfig.EntModulePath = filepath.Join(cfg.Package, cfg.OutputDir, cfg.EntConfig.Target)
+	cfg.ServiceConfig.EntModulePath = cfg.EntConfig.ModuleName
 	cfg.ServiceConfig.GraphQLModulePath = filepath.Join(cfg.Package, cfg.OutputDir, cfg.GraphQLConfig.Resolver.Package)
+	cfg.ServiceConfig.OutputPath = filepath.Join(cfg.BasePath, cfg.OutputDir, `service.go`)
+	cfg.ServiceConfig.PackageName = strings.Trim(cfg.OutputDir, `/`)
+
+	gen.config = cfg
 
 	log.Info().Object(`config`, gen.config).Msg(`config loaded`)
 
