@@ -7,18 +7,18 @@ import (
 	"fmt"
 	gqlconfig "github.com/99designs/gqlgen/codegen/config"
 	"github.com/dmalykh/entcontrib/entgql"
-	"github.com/dmalykh/goentgql/config"
+	config2 "github.com/dmalykh/goentgql/generator/config"
 	"os"
 	"path/filepath"
 )
 
 type Generator struct {
 	basePath string
-	config   *config.EntConfig
-	gqlgen   *config.GraphQLConfig
+	config   *config2.EntConfig
+	gqlgen   *config2.GraphQLConfig
 }
 
-func New(conf *config.EntConfig, gqlgen *config.GraphQLConfig) (*Generator, error) {
+func New(conf *config2.EntConfig, gqlgen *config2.GraphQLConfig) (*Generator, error) {
 	if conf.SchemaPath == `` || conf.Target == `` {
 		return nil, fmt.Errorf(`schemapath & target are required`)
 	}
@@ -55,7 +55,7 @@ func (g *Generator) Generate() error {
 		Header:  g.config.Header,
 		IDType:  &field.TypeInfo{Type: field.TypeInt64},
 		Target:  g.config.Target,
-		Package: g.config.Package,
+		Package: g.config.ModuleName,
 	},
 		entc.Extensions(ex),
 	); err != nil {

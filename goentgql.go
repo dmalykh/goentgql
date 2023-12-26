@@ -5,11 +5,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/dmalykh/goentgql/config"
-	"github.com/dmalykh/goentgql/entgen"
-	"github.com/dmalykh/goentgql/gqlgen"
-	"github.com/dmalykh/goentgql/gqlgen/middleware"
+	config2 "github.com/dmalykh/goentgql/generator/config"
+	"github.com/dmalykh/goentgql/generator/entgen"
+	"github.com/dmalykh/goentgql/generator/gqlgen"
+	"github.com/dmalykh/goentgql/generator/gqlgen/middleware"
 	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -25,23 +24,19 @@ type GoEntGQL interface {
 func New(options ...Option) GoEntGQL {
 	var s = app{
 		schemaDir: `/schema`,
-		migrator: func(drv *sql.Driver) Migrator {
-			return &dummyMigrator{}
-		},
 	}
+
 	for _, option := range options {
 		option(&s)
 	}
+
 	return &s
 }
 
 type app struct {
-	schemaDir        string
-	packageName      string
-	executableSchema ExecutableSchema
-	extensions       []graphql.HandlerExtension
-	driver           *sql.Driver
-	migrator         MigrationRunner
+	schemaDir   string
+	packageName string
+	service     ServiceRunner
 }
 
 func (s *app) Execute(ctx context.Context) error {
@@ -65,11 +60,11 @@ func (s *app) generateCmd() *cli.Command {
 		Usage: "generates ent&gqlgen code",
 		Action: func(c *cli.Context) error {
 			// Create Configuration
-			cfg, err := config.NewGenerate(&config.ConfigGenerate{
-				BasePath: c.Args().Get(0),
-				Package:  s.packageName,
-				Dir:      `/generated`,
-				EntConfig: &config.EntConfig{
+			cfg, err := config2.NewGenerator(&config2.GeneratorConfig{
+				BasePath:  c.Args().Get(0),
+				Package:   s.packageName,
+				OutputDir: `/generated`,
+				EntConfig: &config2.EntConfig{
 					SchemaPath: s.schemaDir,
 				},
 			})
@@ -125,6 +120,11 @@ func (s *app) runCmd() *cli.Command {
 				Usage:   `dsn for ent`,
 				EnvVars: []string{`DSN`},
 			},
+			&cli.BoolFlag{
+				Name:    `skip-migrations`,
+				Usage:   `skip migrations`,
+				EnvVars: []string{`SKIP_MIGRATIONS`},
+			},
 		},
 		Action: func(c *cli.Context) error {
 
@@ -133,12 +133,16 @@ func (s *app) runCmd() *cli.Command {
 				return fmt.Errorf(`can't connect to database: %w`, err)
 			}
 
-			if err := s.migrator(drv).Create(c.Context, schema.WithGlobalUniqueID(true)); err != nil {
-				return fmt.Errorf(`can't migrate database: %w`, err)
+			svc := s.service(drv)
+
+			if !c.Bool(`skip-migrations`) {
+				if err := svc.MigrateSchema(c.Context, schema.WithGlobalUniqueID(true)); err != nil {
+					return fmt.Errorf(`can't migrate database: %w`, err)
+				}
 			}
 
 			fmt.Printf("Listen %s...\n", c.String(`addr`))
-			return runner.Run(s.executableSchema(drv), &runner.Config{
+			return runner.Run(svc.ExecutionSchema(), &runner.Config{
 				Addr:    c.String(`addr`),
 				Name:    s.packageName,
 				Verbose: c.Bool(`verbose`),

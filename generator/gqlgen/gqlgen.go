@@ -3,7 +3,7 @@ package gqlgen
 import (
 	"github.com/99designs/gqlgen/api"
 	gqlconfig "github.com/99designs/gqlgen/codegen/config"
-	"github.com/dmalykh/goentgql/config"
+	"github.com/dmalykh/goentgql/generator/config"
 )
 
 type GQLGen struct {

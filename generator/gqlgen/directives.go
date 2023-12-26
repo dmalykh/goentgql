@@ -1,7 +1,7 @@
 package gqlgen
 
 import (
-	"github.com/dmalykh/entcontrib/entgql"
+	"entgo.io/contrib/entgql"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
