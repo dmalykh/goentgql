@@ -13,6 +13,7 @@ import (
 	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	_ "github.com/xiaoqidun/entps"
 	"os"
@@ -76,6 +77,9 @@ func (s *app) generateCmd() *cli.Command {
 
 			{
 				// Generate ent
+				log.Info().Interface(`end config`, cfg.EntConfig()).
+					Interface(`gqlgen config`, cfg.GraphQLConfig()).Msg(`Generating ent files...`)
+
 				gen, err := entgen.New(cfg.EntConfig(), cfg.GraphQLConfig())
 				if err != nil {
 					return fmt.Errorf(`init entgen error: %w`, err)
@@ -88,6 +92,8 @@ func (s *app) generateCmd() *cli.Command {
 
 			{
 				// Generate gqlgen
+				log.Info().Interface(`gqlgen config`, cfg.GraphQLConfig()).Msg(`Generating gqlgen files...`)
+
 				if err := gqlgen.New(cfg.GraphQLConfig()).Generate(); err != nil {
 					return fmt.Errorf(`error generate gqlgen: %w`, err)
 				}
@@ -95,6 +101,8 @@ func (s *app) generateCmd() *cli.Command {
 
 			{
 				// Generate service
+				log.Info().Interface(`service config`, cfg.ServiceConfig()).Msg(`Generating service files...`)
+
 				if err := service.New(cfg.ServiceConfig()).Generate(); err != nil {
 					return fmt.Errorf(`error generate service: %w`, err)
 				}

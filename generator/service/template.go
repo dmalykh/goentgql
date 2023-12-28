@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/dmalykh/goentgql"
 	"github.com/dmalykh/goentgql/generator/gqlgen/directive"
+	"reflect"
 
 	gent "{{ .EntModulePath }}"
 	graphqlgen "{{ .GraphQLModulePath }}"
@@ -31,9 +32,9 @@ func (s *Service) MigrateSchema(ctx context.Context, opts ...schema.MigrateOptio
 }
 
 func (s *Service) ExecutionSchema() graphql.ExecutableSchema {
-	var directiveRoot graphqlgen.DirectiveRoot
-	if reflect.ValueOf(directiveRoot).FieldByName("Validation").CanSet() {
-		reflect.ValueOf(directiveRoot).FieldByName("Validation").Set(reflect.ValueOf(directive.NewValidator()))
+	var directiveRoot = graphqlgen.DirectiveRoot{}
+	if f := reflect.ValueOf(&directiveRoot).Elem().FieldByName("Validation"); f.CanSet() {
+		f.Set(reflect.ValueOf(directive.NewValidator().Validation))
 	}
 
 	return graphqlgen.NewExecutableSchema(

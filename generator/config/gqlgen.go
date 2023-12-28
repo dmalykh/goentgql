@@ -48,7 +48,7 @@ func GQLGenDefaultConfig() *GraphQLConfig {
 			Package: `graphqlgen`,
 		},
 		Directives: map[string]config.DirectiveConfig{
-			`validation`: {SkipRuntime: true},
+			`validation`: {SkipRuntime: false},
 		},
 		AutoBind: []string{},
 		Models: config.TypeMap{

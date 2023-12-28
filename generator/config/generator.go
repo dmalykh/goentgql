@@ -4,8 +4,6 @@ import (
 	"dario.cat/mergo"
 	"fmt"
 	"github.com/99designs/gqlgen/codegen/config"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"path/filepath"
 	"strings"
 )
@@ -19,15 +17,6 @@ type GeneratorConfig struct {
 	EntConfig     *EntConfig
 	GraphQLConfig *GraphQLConfig
 	ServiceConfig *ServiceConfig
-}
-
-func (g *GeneratorConfig) MarshalZerologObject(e *zerolog.Event) {
-	e.Str(`BasePath`, g.BasePath).
-		Str(`Package`, g.Package).
-		Str(`OutputDir`, g.OutputDir).
-		Interface(`EntConfig`, g.EntConfig).
-		Interface(`GraphQLConfig`, g.GraphQLConfig).
-		Interface(`ServiceConfig`, g.ServiceConfig)
 }
 
 type ConfiguratorGenerate struct {
@@ -78,8 +67,6 @@ func NewGenerator(conf *GeneratorConfig) (*ConfiguratorGenerate, error) {
 	cfg.ServiceConfig.PackageName = strings.Trim(cfg.OutputDir, `/`)
 
 	gen.config = cfg
-
-	log.Info().Object(`config`, gen.config).Msg(`config loaded`)
 
 	return gen, nil
 }
