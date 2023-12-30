@@ -1,7 +1,7 @@
 package gqlgen
 
 import (
-	"entgo.io/contrib/entgql"
+	"github.com/dmalykh/entcontrib/entgql"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -17,5 +17,6 @@ func Validation(rule string) entgql.Directive {
 			},
 		})
 	}
-	return entgql.NewDirective("validation", args...)
+
+	return entgql.NewConstrainDirective(`validation`, `Kind == INPUT_OBJECT`, args...)
 }
