@@ -4,6 +4,7 @@ import (
 	"dario.cat/mergo"
 	"fmt"
 	"github.com/99designs/gqlgen/codegen/config"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 type GraphQLConfig config.Config
@@ -30,6 +31,12 @@ func GQLGenDefaultConfig() *GraphQLConfig {
 		ResolversAlwaysReturnPointers: true,
 		NullableInputOmittable:        false,
 
+		Sources: []*ast.Source{
+			{
+				Name:  `directive_validation`,
+				Input: `directive @validation(rule: String!) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`,
+			},
+		},
 		SchemaFilename: config.StringList{
 			`schema/*.graphql`,
 		},

@@ -24,7 +24,7 @@ type GoEntGQL interface {
 }
 
 func New(options ...Option) GoEntGQL {
-	var s = app{
+	var s = App{
 		schemaDir: `/schema`,
 	}
 
@@ -35,13 +35,14 @@ func New(options ...Option) GoEntGQL {
 	return &s
 }
 
-type app struct {
+type App struct {
 	schemaDir   string
 	packageName string
 	service     ServiceRunner
+	extensions  []Extension
 }
 
-func (s *app) Execute(ctx context.Context) error {
+func (s *App) Execute(ctx context.Context) error {
 	app := &cli.App{
 		Commands: []*cli.Command{
 			s.generateCmd(),
@@ -56,7 +57,7 @@ func (s *app) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (s *app) generateCmd() *cli.Command {
+func (s *App) generateCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "generate",
 		Usage: "generates ent&gqlgen code",
@@ -70,6 +71,14 @@ func (s *app) generateCmd() *cli.Command {
 					SchemaPath: s.schemaDir,
 				},
 			})
+
+			for _, ext := range s.extensions {
+				if genext, ok := ext.(GeneratorExtension); ok {
+					if err := genext.Generator(c, cfg); err != nil {
+						return fmt.Errorf(`can't execute extension: %w`, err)
+					}
+				}
+			}
 
 			if err != nil {
 				return fmt.Errorf(`generate: config error: %w`, err)
@@ -107,12 +116,15 @@ func (s *app) generateCmd() *cli.Command {
 					return fmt.Errorf(`error generate service: %w`, err)
 				}
 			}
+
+			log.Info().Msg(`Done`)
+
 			return nil
 		},
 	}
 }
 
-func (s *app) runCmd() *cli.Command {
+func (s *App) runCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "run",
 		Usage: "run the service",
@@ -130,11 +142,13 @@ func (s *app) runCmd() *cli.Command {
 				Name:    `driver`,
 				Usage:   `driver for ent`,
 				EnvVars: []string{`DRIVER`},
+				Value:   `sqlite3`,
 			},
 			&cli.StringFlag{
 				Name:    `dsn`,
 				Usage:   `dsn for ent`,
 				EnvVars: []string{`DSN`},
+				Value:   `file:ent?mode=memory&cache=shared&_fk=1`,
 			},
 			&cli.BoolFlag{
 				Name:    `skip-migrations`,
@@ -150,6 +164,14 @@ func (s *app) runCmd() *cli.Command {
 			}
 
 			svc := s.service(drv)
+
+			for _, ext := range s.extensions {
+				if runext, ok := ext.(RunnerExtension); ok {
+					if err := runext.Runner(c, svc); err != nil {
+						return fmt.Errorf(`can't execute extension: %w`, err)
+					}
+				}
+			}
 
 			if !c.Bool(`skip-migrations`) {
 				if err := svc.MigrateSchema(c.Context, schema.WithGlobalUniqueID(true)); err != nil {
