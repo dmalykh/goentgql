@@ -5,19 +5,29 @@ import (
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/go-playground/validator/v10"
-	"regexp"
+	"strings"
 )
 
 func NewValidator() *Directive {
 	var validate = validator.New()
 	{
-		validate.RegisterValidation(`slug`, func(fl validator.FieldLevel) bool {
-			var r = regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
-			return r.MatchString(fl.Field().String())
+		validate.RegisterValidation(`alphanumwith`, func(fl validator.FieldLevel) bool {
+			var symbols = strings.Split(fl.Param(), "")
+			var oldnew = make([]string, 0, len(symbols)*2)
+			for i := 0; i < len(symbols); i++ {
+				oldnew = append(oldnew, symbols[i], "")
+			}
+
+			return validate.Var(strings.NewReplacer(oldnew...).Replace(fl.Field().String()), "alphanum") == nil
 		})
-		validate.RegisterValidation(`title`, func(fl validator.FieldLevel) bool {
-			var r = regexp.MustCompile(`^[\\p{L} \\p{N}]+$`)
-			return r.MatchString(fl.Field().String())
+		validate.RegisterValidation(`alphanumunicodewith`, func(fl validator.FieldLevel) bool {
+			var symbols = strings.Split(fl.Param(), "")
+			var oldnew = make([]string, 0, len(symbols)*2)
+			for i := 0; i < len(symbols); i++ {
+				oldnew = append(oldnew, symbols[i], "")
+			}
+
+			return validate.Var(strings.NewReplacer(oldnew...).Replace(fl.Field().String()), "alphanumunicode") == nil
 		})
 	}
 	return &Directive{
