@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
+	gqlgenconfig "github.com/99designs/gqlgen/codegen/config"
 	"github.com/dmalykh/goentgql/generator/config"
 	"github.com/dmalykh/goentgql/generator/entgen"
 	"github.com/dmalykh/goentgql/generator/gqlgen"
@@ -36,10 +37,13 @@ func New(options ...Option) GoEntGQL {
 }
 
 type App struct {
-	schemaDir   string
-	packageName string
-	service     ServiceRunner
-	extensions  []Extension
+	schemaDir     string
+	packageName   string
+	service       ServiceRunner
+	extensions    []Extension
+	configOptions struct {
+		IDType []string
+	}
 }
 
 func (s *App) Execute(ctx context.Context) error {
@@ -69,6 +73,13 @@ func (s *App) generateCmd() *cli.Command {
 				OutputDir: `/generated`,
 				EntConfig: &config.EntConfig{
 					SchemaPath: s.schemaDir,
+				},
+				GraphQLConfig: &config.GraphQLConfig{
+					Models: gqlgenconfig.TypeMap{
+						`ID`: gqlgenconfig.TypeMapEntry{
+							Model: s.configOptions.IDType,
+						},
+					},
 				},
 			})
 

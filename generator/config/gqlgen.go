@@ -61,7 +61,7 @@ func GQLGenDefaultConfig() *GraphQLConfig {
 		Models: config.TypeMap{
 			`ID`: config.TypeMapEntry{
 				Model: config.StringList{
-					`github.com/99designs/gqlgen/graphql.Int64`,
+					`github.com/99designs/gqlgen/graphql.String`,
 				},
 			},
 			`Int`: config.TypeMapEntry{

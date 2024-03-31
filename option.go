@@ -19,6 +19,12 @@ func RunService(f ServiceRunner) Option {
 	}
 }
 
+func IDType(idType string) Option {
+	return func(s *App) {
+		s.configOptions.IDType = append(s.configOptions.IDType, idType)
+	}
+}
+
 func AddExtension(ext Extension) Option {
 	return func(s *App) {
 		s.extensions = append(s.extensions, ext)

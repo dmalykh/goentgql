@@ -13,6 +13,8 @@ import (
 
 	gent "{{ .EntModulePath }}"
 	graphqlgen "{{ .GraphQLModulePath }}"
+
+	_ "{{ .EntModulePath }}/runtime"
 )
 
 func NewService(client *gent.Client, resolver graphqlgen.ResolverRoot) *Service {
