@@ -25,6 +25,12 @@ func IDType(idType string) Option {
 	}
 }
 
+func WithGlobalUniqueID(yes bool) Option {
+	return func(s *App) {
+		s.configOptions.WithGlobalUniqueID = yes
+	}
+}
+
 func AddExtension(ext Extension) Option {
 	return func(s *App) {
 		s.extensions = append(s.extensions, ext)

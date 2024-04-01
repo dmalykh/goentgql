@@ -42,7 +42,8 @@ type App struct {
 	service       ServiceRunner
 	extensions    []Extension
 	configOptions struct {
-		IDType []string
+		IDType             []string
+		WithGlobalUniqueID bool
 	}
 }
 
@@ -185,7 +186,7 @@ func (s *App) runCmd() *cli.Command {
 			}
 
 			if !c.Bool(`skip-migrations`) {
-				if err := svc.MigrateSchema(c.Context, schema.WithGlobalUniqueID(true)); err != nil {
+				if err := svc.MigrateSchema(c.Context, schema.WithGlobalUniqueID(s.configOptions.WithGlobalUniqueID)); err != nil {
 					return fmt.Errorf(`can't migrate database: %w`, err)
 				}
 			}

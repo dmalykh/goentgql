@@ -4,7 +4,6 @@ go 1.21.1
 
 require (
 	dario.cat/mergo v1.0.0
-	entgo.io/contrib v0.4.5
 	entgo.io/ent v0.12.5
 	github.com/99designs/gqlgen v0.17.41
 	github.com/dmalykh/entcontrib v0.1.5

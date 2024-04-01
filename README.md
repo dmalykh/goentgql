@@ -36,7 +36,11 @@ func main() {
 
 
 TODO:
+
 [] Refactoring: the current codebase was written as experiment and looks ugly
+
 [] Test coverage
+
 [] Make everything configurable
+
 [] Make the run command configurable using https://github.com/knadh/koanf

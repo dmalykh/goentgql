@@ -2,13 +2,14 @@ package bramble
 
 import (
 	"bytes"
+	"context"
+	gqlgen "github.com/99designs/gqlgen/codegen/config"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/dmalykh/goentgql"
 	"github.com/dmalykh/goentgql/generator/config"
 	"github.com/urfave/cli/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
-
-	gqlgen "github.com/99designs/gqlgen/codegen/config"
 )
 
 //var _ goentgql.GeneratorExtension = nil.(*bramble)
@@ -38,6 +39,10 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		ForceGenerate: false,
 	}
 
+	cfg.GraphQLConfig().Directives = map[string]gqlgen.DirectiveConfig{
+		`boundary`: {SkipRuntime: false},
+	}
+
 	return nil
 }
 
@@ -48,6 +53,10 @@ func (b *bramble) Runner(c *cli.Context, svc goentgql.Service) error {
 	service.Name = b.service.Name
 	service.Version = b.service.Version
 	service.Schema = buf.String()
+
+	svc.AddDirective(`boundary`, func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+		return next(ctx)
+	})
 
 	return nil
 }
