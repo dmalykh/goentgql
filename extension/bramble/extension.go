@@ -39,24 +39,26 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		ForceGenerate: false,
 	}
 
-	cfg.GraphQLConfig().Directives = map[string]gqlgen.DirectiveConfig{
-		`boundary`: {SkipRuntime: false},
+	cfg.GraphQLConfig().Directives[`boundary`] = gqlgen.DirectiveConfig{
+		SkipRuntime: false,
 	}
 
 	return nil
 }
 
 func (b *bramble) Runner(c *cli.Context, svc goentgql.Service) error {
+	// Add directive
+	svc.AddDirective(`Boundary`, func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+		return next(ctx)
+	})
+
+	// Add data to a service
 	var buf bytes.Buffer
 	formatter.NewFormatter(&buf).FormatSchema(svc.ExecutionSchema().Schema())
 
 	service.Name = b.service.Name
 	service.Version = b.service.Version
 	service.Schema = buf.String()
-
-	svc.AddDirective(`boundary`, func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
-		return next(ctx)
-	})
 
 	return nil
 }

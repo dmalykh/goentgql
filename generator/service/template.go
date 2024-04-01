@@ -57,7 +57,7 @@ func (s *Service) ExecutionSchema() graphql.ExecutableSchema {
 }
 
 func (s *Service) AddDirective(name string, f any) {
-	s.directives[strings.ToTitle(name)] = f
+	s.directives[name] = f
 }
 
 `
