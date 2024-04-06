@@ -6,7 +6,7 @@ require (
 	dario.cat/mergo v1.0.0
 	entgo.io/ent v0.12.5
 	github.com/99designs/gqlgen v0.17.41
-	github.com/dmalykh/entcontrib v0.1.6
+	github.com/dmalykh/entcontrib v0.1.7
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jackc/pgx/v4 v4.18.1

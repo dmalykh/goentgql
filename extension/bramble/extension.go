@@ -58,6 +58,9 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		entgql.RelayNode: {
 			NamespaceDirective(),
 		},
+		entgql.OrderDirectionEnum: {
+			NamespaceDirective(),
+		},
 	})
 
 	return nil
