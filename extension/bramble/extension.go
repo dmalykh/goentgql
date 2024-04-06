@@ -5,6 +5,7 @@ import (
 	"context"
 	gqlgen "github.com/99designs/gqlgen/codegen/config"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/dmalykh/entcontrib/entgql"
 	"github.com/dmalykh/goentgql"
 	"github.com/dmalykh/goentgql/generator/config"
 	"github.com/urfave/cli/v2"
@@ -42,6 +43,22 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 	cfg.GraphQLConfig().Directives[`boundary`] = gqlgen.DirectiveConfig{
 		SkipRuntime: false,
 	}
+
+	cfg.GraphQLConfig().Directives[`namespace`] = gqlgen.DirectiveConfig{
+		SkipRuntime: false,
+	}
+
+	cfg.EntConfig().Extensions[`withRelaySpec`] = entgql.WithRelaySpec(true, map[string][]entgql.Directive{
+		entgql.RelayCursor: {
+			NamespaceDirective(),
+		},
+		entgql.RelayPageInfo: {
+			NamespaceDirective(),
+		},
+		entgql.RelayNode: {
+			NamespaceDirective(),
+		},
+	})
 
 	return nil
 }

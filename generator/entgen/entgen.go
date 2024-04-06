@@ -7,18 +7,19 @@ import (
 	"fmt"
 	gqlconfig "github.com/99designs/gqlgen/codegen/config"
 	"github.com/dmalykh/entcontrib/entgql"
-	config2 "github.com/dmalykh/goentgql/generator/config"
+	"github.com/dmalykh/goentgql/generator/config"
+	"github.com/samber/lo"
 	"os"
 	"path/filepath"
 )
 
 type Generator struct {
 	basePath string
-	config   *config2.EntConfig
-	gqlgen   *config2.GraphQLConfig
+	config   *config.EntConfig
+	gqlgen   *config.GraphQLConfig
 }
 
-func New(conf *config2.EntConfig, gqlgen *config2.GraphQLConfig) (*Generator, error) {
+func New(conf *config.EntConfig, gqlgen *config.GraphQLConfig) (*Generator, error) {
 	if conf.SchemaPath == `` || conf.Target == `` {
 		return nil, fmt.Errorf(`schemapath & target are required`)
 	}
@@ -39,13 +40,13 @@ func New(conf *config2.EntConfig, gqlgen *config2.GraphQLConfig) (*Generator, er
 
 func (g *Generator) Generate() error {
 	var graphqlOutput = filepath.Join(g.config.GraphQLSchemaOutputDir, g.config.GraphQLSchemaOutputFilename)
+
 	ex, err := entgql.NewExtension(
-		entgql.WithCompletedConfig((*gqlconfig.Config)(g.gqlgen)),
-		entgql.WithSchemaPath(graphqlOutput),
-		entgql.WithWhereInputs(false),
-		entgql.WithRelaySpec(true),
-		entgql.WithSchemaGenerator(),
-		entgql.WithEmptyQueryGenerator(),
+		append(
+			lo.Values[string, entgql.ExtensionOption](g.config.Extensions),
+			entgql.WithCompletedConfig((*gqlconfig.Config)(g.gqlgen)),
+			entgql.WithSchemaPath(graphqlOutput),
+		)...,
 	)
 	if err != nil {
 		return fmt.Errorf("creating entgql extension: %w", err)

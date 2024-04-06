@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/dmalykh/entcontrib/entgql"
+)
+
 type EntConfig struct {
 	SchemaPath                  string
 	Header                      string
@@ -7,6 +11,7 @@ type EntConfig struct {
 	GraphQLSchemaOutputDir      string
 	GraphQLSchemaOutputFilename string
 	ModuleName                  string
+	Extensions                  map[string]entgql.ExtensionOption
 }
 
 func EntDefaultConfig() *EntConfig {
@@ -16,5 +21,11 @@ func EntDefaultConfig() *EntConfig {
 		GraphQLSchemaOutputDir:      `/schema/`,
 		GraphQLSchemaOutputFilename: `ent.generated.graphql`,
 		ModuleName:                  `gent`,
+		Extensions: map[string]entgql.ExtensionOption{
+			`withWhereInputs`:         entgql.WithWhereInputs(false),
+			`withRelaySpec`:           entgql.WithRelaySpec(true, nil),
+			`withSchemaGenerator`:     entgql.WithSchemaGenerator(),
+			`withEmptyQueryGenerator`: entgql.WithEmptyQueryGenerator(),
+		},
 	}
 }

@@ -6,12 +6,13 @@ require (
 	dario.cat/mergo v1.0.0
 	entgo.io/ent v0.12.5
 	github.com/99designs/gqlgen v0.17.41
-	github.com/dmalykh/entcontrib v0.1.5
+	github.com/dmalykh/entcontrib v0.1.6
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/rs/zerolog v1.15.0
+	github.com/samber/lo v1.39.0
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/xiaoqidun/entps v0.0.0-20231101165119-01cd6512a038
