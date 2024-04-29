@@ -3,6 +3,7 @@ package bramble
 import (
 	"bytes"
 	"context"
+	"entgo.io/ent/entc/gen"
 	gqlgen "github.com/99designs/gqlgen/codegen/config"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/dmalykh/entcontrib/entgql"
@@ -61,6 +62,10 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		entgql.OrderDirectionEnum: {
 			NamespaceDirective(),
 		},
+	})
+
+	cfg.EntConfig().Extensions[`brambleSH`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
+		return nil
 	})
 
 	return nil
