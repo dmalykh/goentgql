@@ -35,5 +35,6 @@ func EntDefaultConfig() *EntConfig {
 			`withSchemaGenerator`:     entgql.WithSchemaGenerator(),
 			`withEmptyQueryGenerator`: entgql.WithEmptyQueryGenerator(),
 		},
+		EntExtensions: map[string]entc.Extension{},
 	}
 }

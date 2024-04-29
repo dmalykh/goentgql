@@ -78,6 +78,17 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 				case fmt.Sprintf(`%sConnection`, node.Name):
 					typ.Directives = append(typ.Directives, &ast.Directive{
 						Name: `boundary`,
+					}, &ast.Directive{
+						Name: `goModel`,
+						Arguments: []*ast.Argument{
+							{
+								Name: `model`,
+								Value: &ast.Value{
+									Raw:  fmt.Sprintf(`%s/%sBrambleConnection`, cfg.EntConfig().Package, node.Name),
+									Kind: ast.StringValue,
+								},
+							},
+						},
 					})
 					typ.Fields = append(typ.Fields, &ast.FieldDefinition{
 						Name:        `ID`,
