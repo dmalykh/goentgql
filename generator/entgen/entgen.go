@@ -2,8 +2,6 @@ package entgen
 
 import (
 	"entgo.io/ent/entc"
-	"entgo.io/ent/entc/gen"
-	"entgo.io/ent/schema/field"
 	"fmt"
 	gqlconfig "github.com/99designs/gqlgen/codegen/config"
 	"github.com/dmalykh/entcontrib/entgql"
@@ -43,7 +41,7 @@ func (g *Generator) Generate() error {
 
 	ex, err := entgql.NewExtension(
 		append(
-			lo.Values[string, entgql.ExtensionOption](g.config.Extensions),
+			lo.Values[string, entgql.ExtensionOption](g.config.GraphQLExtensions),
 			entgql.WithCompletedConfig((*gqlconfig.Config)(g.gqlgen)),
 			entgql.WithSchemaPath(graphqlOutput),
 		)...,
@@ -52,13 +50,8 @@ func (g *Generator) Generate() error {
 		return fmt.Errorf("creating entgql extension: %w", err)
 	}
 
-	if err := entc.Generate(g.config.SchemaPath, &gen.Config{
-		Header:  g.config.Header,
-		IDType:  &field.TypeInfo{Type: field.TypeInt64},
-		Target:  g.config.Target,
-		Package: g.config.ModuleName,
-	},
-		entc.Extensions(ex),
+	if err := entc.Generate(g.config.SchemaPath, g.config.Config,
+		entc.Extensions(append(lo.Values[string, entc.Extension](g.config.EntExtensions), ex)...),
 	); err != nil {
 		return fmt.Errorf("running ent codegen: %w", err)
 	}

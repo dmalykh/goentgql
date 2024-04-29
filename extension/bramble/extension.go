@@ -15,7 +15,8 @@ import (
 	"github.com/vektah/gqlparser/v2/formatter"
 )
 
-//var _ goentgql.GeneratorExtension = nil.(*bramble)
+var _ goentgql.GeneratorExtension = (*bramble)(nil)
+var _ goentgql.RunnerExtension = (*bramble)(nil)
 
 type bramble struct {
 	service *Service
@@ -50,7 +51,7 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		SkipRuntime: false,
 	}
 
-	cfg.EntConfig().Extensions[`brambleExtension`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
+	cfg.EntConfig().GraphQLExtensions[`brambleExtension`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
 		for _, node := range g.Nodes {
 			if _, exist := node.Annotations[ConnectionAnnotationName]; !exist {
 				continue
@@ -89,6 +90,8 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 
 		return nil
 	})
+
+	cfg.EntConfig().EntExtensions[`brambleConnectionIDExtension`] = &entExtension{}
 
 	return nil
 }

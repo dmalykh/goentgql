@@ -38,7 +38,7 @@ func NewGenerator(conf *GeneratorConfig) (*ConfiguratorGenerate, error) {
 
 	cfg.GraphQLConfig.AutoBind = append(cfg.GraphQLConfig.AutoBind,
 		filepath.Join(cfg.Package, cfg.OutputDir, cfg.EntConfig.Target))
-	cfg.EntConfig.ModuleName = filepath.Join(cfg.Package, cfg.OutputDir, cfg.EntConfig.ModuleName)
+	cfg.EntConfig.Package = filepath.Join(cfg.Package, cfg.OutputDir, cfg.EntConfig.Package)
 
 	// Make paths for generated files absolute
 	cfg.EntConfig.SchemaPath = filepath.Join(cfg.BasePath, cfg.EntConfig.SchemaPath)
@@ -61,7 +61,7 @@ func NewGenerator(conf *GeneratorConfig) (*ConfiguratorGenerate, error) {
 	// Service config
 	cfg.EntConfig.Header = cfg.Header
 	cfg.ServiceConfig.Header = cfg.Header
-	cfg.ServiceConfig.EntModulePath = cfg.EntConfig.ModuleName
+	cfg.ServiceConfig.EntModulePath = cfg.EntConfig.Package
 	cfg.ServiceConfig.GraphQLModulePath = filepath.Join(cfg.Package, cfg.OutputDir, cfg.GraphQLConfig.Resolver.Package)
 	cfg.ServiceConfig.OutputPath = filepath.Join(cfg.BasePath, cfg.OutputDir, `service.go`)
 	cfg.ServiceConfig.PackageName = strings.Trim(cfg.OutputDir, `/`)
