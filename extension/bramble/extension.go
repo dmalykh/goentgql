@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"entgo.io/ent/entc/gen"
+	"fmt"
 	gqlgen "github.com/99designs/gqlgen/codegen/config"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/dmalykh/entcontrib/entgql"
@@ -49,22 +50,43 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 		SkipRuntime: false,
 	}
 
-	cfg.EntConfig().Extensions[`withRelaySpec`] = entgql.WithRelaySpec(true, map[string][]entgql.Directive{
-		entgql.RelayCursor: {
-			NamespaceDirective(),
-		},
-		entgql.RelayPageInfo: {
-			NamespaceDirective(),
-		},
-		entgql.RelayNode: {
-			NamespaceDirective(),
-		},
-		entgql.OrderDirectionEnum: {
-			NamespaceDirective(),
-		},
-	})
+	cfg.EntConfig().Extensions[`brambleExtension`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
+		for _, node := range g.Nodes {
+			if _, exist := node.Annotations[ConnectionAnnotationName]; !exist {
+				continue
+			}
 
-	cfg.EntConfig().Extensions[`brambleSH`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
+			for _, typ := range s.Types {
+				switch typ.Name {
+				case entgql.RelayCursor:
+					typ.Directives = append(typ.Directives, &ast.Directive{
+						Name: `namespace`,
+					})
+				case entgql.RelayPageInfo:
+					typ.Directives = append(typ.Directives, &ast.Directive{
+						Name: `namespace`,
+					})
+				case entgql.RelayNode:
+					typ.Directives = append(typ.Directives, &ast.Directive{
+						Name: `namespace`,
+					})
+				case entgql.OrderDirectionEnum:
+					typ.Directives = append(typ.Directives, &ast.Directive{
+						Name: `namespace`,
+					})
+				case fmt.Sprintf(`%sConnection`, node.Name):
+					typ.Directives = append(typ.Directives, &ast.Directive{
+						Name: `boundary`,
+					})
+					typ.Fields = append(typ.Fields, &ast.FieldDefinition{
+						Name:        `ID`,
+						Type:        ast.NamedType(`ID`, nil),
+						Description: "ID for connection",
+					})
+				}
+			}
+		}
+
 		return nil
 	})
 
