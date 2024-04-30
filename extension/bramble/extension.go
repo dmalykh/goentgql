@@ -84,7 +84,7 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 							{
 								Name: `model`,
 								Value: &ast.Value{
-									Raw:  fmt.Sprintf(`%s/%sBrambleConnection`, cfg.EntConfig().Package, node.Name),
+									Raw:  fmt.Sprintf(`%s.%sBrambleConnection`, cfg.EntConfig().Package, node.Name),
 									Kind: ast.StringValue,
 								},
 							},
