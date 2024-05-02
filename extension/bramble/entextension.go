@@ -7,6 +7,8 @@ import (
 
 var _ entc.Extension = (*entExtension)(nil)
 
+var BrambleConnectionSuffix = "BrambleConnection"
+
 type entExtension struct {
 	entc.DefaultExtension
 }
@@ -27,8 +29,8 @@ func (*entExtension) Templates() []*gen.Template {
 {{ range $n := $.Nodes }}
 	{{if index $n.Annotations "` + ConnectionAnnotationName + `" }}
 
-type {{$n.Name}}BrambleConnection struct {
-	{{$n.Name}}Connection
+type {{$n.Name}}` + BrambleConnectionSuffix + ` struct {
+	*{{$n.Name}}Connection
 	ID string
 }
 

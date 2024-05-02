@@ -25,6 +25,9 @@ type bramble struct {
 func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) error {
 	cfg.GraphQLConfig().Sources = append([]*ast.Source{
 		{Name: `bramble`, Input: `
+			directive @boundary on OBJECT | FIELD_DEFINITION
+			directive @namespace on OBJECT | FIELD_DEFINITION | SCALAR | INTERFACE | ENUM
+
 			type Service {
 			  name: String! # unique name for the service
 			  version: String! # any string
@@ -50,7 +53,6 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 	cfg.GraphQLConfig().Directives[`namespace`] = gqlgen.DirectiveConfig{
 		SkipRuntime: false,
 	}
-
 	cfg.EntConfig().GraphQLExtensions[`brambleExtension`] = entgql.WithSchemaHook(func(g *gen.Graph, s *ast.Schema) error {
 		for _, node := range g.Nodes {
 			if _, exist := node.Annotations[ConnectionAnnotationName]; !exist {
@@ -76,25 +78,34 @@ func (b *bramble) Generator(c *cli.Context, cfg *config.ConfiguratorGenerate) er
 						Name: `namespace`,
 					})
 				case fmt.Sprintf(`%sConnection`, node.Name):
-					typ.Directives = append(typ.Directives, &ast.Directive{
-						Name: `boundary`,
-					}, &ast.Directive{
-						Name: `goModel`,
-						Arguments: []*ast.Argument{
-							{
-								Name: `model`,
-								Value: &ast.Value{
-									Raw:  fmt.Sprintf(`%s.%sBrambleConnection`, cfg.EntConfig().Package, node.Name),
-									Kind: ast.StringValue,
+
+					s.Types[fmt.Sprintf(`%s%s`, node.Name, BrambleConnectionSuffix)] = &ast.Definition{
+						Kind: ast.Object,
+						Name: fmt.Sprintf(`%s%s`, node.Name, BrambleConnectionSuffix),
+						Directives: []*ast.Directive{
+							&ast.Directive{
+								Name: `boundary`,
+							}, &ast.Directive{
+								Name: `goModel`,
+								Arguments: []*ast.Argument{
+									{
+										Name: `model`,
+										Value: &ast.Value{
+											Raw:  fmt.Sprintf(`%s.%sBrambleConnection`, cfg.EntConfig().Package, node.Name),
+											Kind: ast.StringValue,
+										},
+									},
 								},
 							},
 						},
-					})
-					typ.Fields = append(typ.Fields, &ast.FieldDefinition{
-						Name:        `ID`,
-						Type:        ast.NamedType(`ID`, nil),
-						Description: "ID for connection",
-					})
+						Fields: append([]*ast.FieldDefinition{
+							&ast.FieldDefinition{
+								Name:        `ID`,
+								Type:        ast.NamedType(`ID`, nil),
+								Description: "ID for connection",
+							},
+						}, typ.Fields...),
+					}
 				}
 			}
 		}
