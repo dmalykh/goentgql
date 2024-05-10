@@ -1,10 +1,17 @@
 package bramble
 
-import (
-	"entgo.io/ent/schema"
-	"github.com/dmalykh/entcontrib/entgql"
-)
+import "entgo.io/ent/entc"
 
-func BrambleBoundary() schema.Annotation {
-	return entgql.Directives(BoundaryDirective(), NamespaceDirective())
+const ConnectionAnnotationName = `BrambleConnection`
+
+func ConnectionAnnotation() entc.Annotation {
+	return &connectionAnnotation{}
+}
+
+type connectionAnnotation struct {
+	entc.Annotation
+}
+
+func (connectionAnnotation) Name() string {
+	return `BrambleConnection`
 }
