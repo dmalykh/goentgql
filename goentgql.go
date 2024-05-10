@@ -2,7 +2,9 @@ package goentgql
 
 import (
 	"context"
-	"entgo.io/ent/dialect/sql"
+	"database/sql"
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
 	gqlgenconfig "github.com/99designs/gqlgen/codegen/config"
@@ -13,7 +15,7 @@ import (
 	"github.com/dmalykh/goentgql/generator/service"
 	"github.com/dmalykh/goentgql/runner"
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	_ "github.com/xiaoqidun/entps"
@@ -84,16 +86,16 @@ func (s *App) generateCmd() *cli.Command {
 				},
 			})
 
+			if err != nil {
+				return fmt.Errorf(`generate: config error: %w`, err)
+			}
+
 			for _, ext := range s.extensions {
 				if genext, ok := ext.(GeneratorExtension); ok {
 					if err := genext.Generator(c, cfg); err != nil {
 						return fmt.Errorf(`can't execute extension: %w`, err)
 					}
 				}
-			}
-
-			if err != nil {
-				return fmt.Errorf(`generate: config error: %w`, err)
 			}
 
 			{
@@ -152,9 +154,15 @@ func (s *App) runCmd() *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:    `driver`,
-				Usage:   `driver for ent`,
+				Usage:   `driver for a database`,
 				EnvVars: []string{`DRIVER`},
 				Value:   `sqlite3`,
+			},
+			&cli.StringFlag{
+				Name:    `dialect`,
+				Usage:   `dialect for ent`,
+				EnvVars: []string{`DIALECT`},
+				Value:   dialect.SQLite,
 			},
 			&cli.StringFlag{
 				Name:    `dsn`,
@@ -170,12 +178,12 @@ func (s *App) runCmd() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 
-			drv, err := sql.Open(c.String(`driver`), c.String(`dsn`))
+			db, err := sql.Open(c.String(`driver`), c.String(`dsn`))
 			if err != nil {
 				return fmt.Errorf(`can't connect to database: %w`, err)
 			}
 
-			svc := s.service(drv)
+			svc := s.service(entsql.OpenDB(c.String(`dialect`), db))
 
 			for _, ext := range s.extensions {
 				if runext, ok := ext.(RunnerExtension); ok {
@@ -200,63 +208,3 @@ func (s *App) runCmd() *cli.Command {
 		},
 	}
 }
-
-//
-//func Run() {
-//
-//
-//	client, err := ent.Open(
-//		cli.Driver, // i.e. sqlite3
-//		cli.DSN,    //i.e. file:ent?mode=memory&cache=shared&_fk=1
-//		ent.Log(func(i ...interface{}) {
-//			log.Debug().Fields(i)
-//		}),
-//	)
-//
-//	// Enable verbose mode
-//	if cli.Verbose {
-//		client = client.Debug()
-//	}
-//
-//	// Create schema
-//	if !cli.NoMigration {
-
-//	}
-//
-//	// Metrics
-//	var totalRequestMetric = promauto.NewCounter(prometheus.CounterOpts{
-//		Name: "request_total",
-//		Help: "The total number of request",
-//	})
-//	var operationDurationMetric = promauto.NewHistogram(prometheus.HistogramOpts{
-//		Name:    "http_server_request_duration_seconds",
-//		Help:    "Histogram of response time for handler in seconds",
-//		Buckets: []float64{.000001, .00001, .0001, .001, .01, .025, .05, .1, .25, .5, 1},
-//	})
-//
-//	var prometheusMiddleware = func(ctx context.Context, next gqlgen.OperationHandler) gqlgen.ResponseHandler {
-//		totalRequestMetric.Inc()
-//		var start = time.Now()
-//		var resp = next(ctx)
-//		var t = time.Since(start).Seconds()
-//		operationDurationMetric.Observe(t)
-//		return resp
-//	}
-//
-//	var errChan = make(chan error)
-//
-//	// Listener for metrics
-//	go func() {
-//		if err := http.ListenAndServe(fmt.Sprintf(`:%s`, cli.PrometheusAddr), promhttp.Handler()); err != nil {
-//			errChan <- err
-//		}
-//	}()
-//
-//	// Server
-//	go func() {
-//		if err := graphql.Run(client, fmt.Sprintf(`:%s`, cli.Addr), cli.Verbose, prometheusMiddleware); err != nil {
-//			errChan <- err
-//		}
-//	}()
-//
-//}
